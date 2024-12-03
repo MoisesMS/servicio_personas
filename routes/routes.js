@@ -6,12 +6,11 @@ const router = express.Router()
 
 router.use(bodyParser.json())
 const notes = []
+
 router.post("/notes", async (req, res) => {
   const token = getToken(req)
-  
-  let tokenValid = await isTokenValid(token)
+  const tokenValid = await isTokenValid(token)
 
-  console.log(tokenValid)
   if(tokenValid.valid) {
     notes.push(req.body)
 
@@ -24,8 +23,9 @@ router.post("/notes", async (req, res) => {
 router.get("/notes", async (req, res) => {
   const token = getToken(req)
   const tokenValid = await isTokenValid(token)
-  const userNotes = notes.filter(notes => notes.user === tokenValid.username)
+  
   if(tokenValid.valid) {
+    const userNotes = notes.filter(notes => notes.user === tokenValid.username)
     res.json(userNotes)
   } else {
     res.status(401).send("Token invalido")  }
@@ -42,9 +42,7 @@ const isTokenValid = async token => {
     return resValid
   } catch(error) {
     console.error(`Error en la verificación del token ${error.message}`)
-    return false
+    return { valid : false}
   }
-
-  
 }
 module.exports = router
